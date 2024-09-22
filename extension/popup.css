@@ -1,0 +1,81 @@
+:root {
+  --light-blue: #0ea5e9;
+  --hover-blue: #0c87e8;
+}
+
+body {
+  background-color: #f9fafb;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 200px;
+  gap: 10px;
+  padding: 6px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 10px;
+}
+
+label {
+  color: var(--light-blue);
+  size: 12px;
+  font-weight: 600;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+input {
+  padding: 6px;
+  border: 1px solid #d1d5db;
+  border-radius: 3px;
+  outline: none;
+  color: #64748b;
+  background-color: transparent;
+  font-size: small;
+}
+
+input:hover {
+  border: 1px solid var(--hover-blue);
+  scale: 1.01;
+  transition: all 0.2s ease-in-out;
+}
+
+input:focus {
+  border: 1px solid var(--light-blue);
+}
+
+button {
+  padding: 5px;
+  border: 1px solid var(--light-blue);
+  border-radius: 3px;
+  background-color: var(--light-blue);
+  color: white;
+  cursor: pointer;
+  outline: none;
+  width: 100%;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+button:hover {
+  background-color: var(--hover-blue);
+  transition: all 0.1s ease-in-out;
+}
+
+span {
+    color: red;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+}

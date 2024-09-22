@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "Letterly",
+  "description": "Creates a cover letter for you",
+  "version": "1.0",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://www.linkedin.com/*"],
+      "js": ["contentScript.js"]
+    }
+  ],
+  "permissions": ["activeTab", "scripting", "webNavigation", "tabs"]
+}
