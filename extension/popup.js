@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", function () {
-
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     const currentTab = tabs[0];
 
@@ -12,9 +11,12 @@ document.addEventListener("DOMContentLoaded", function () {
           if (response) {
             console.log("Organization:", response.organization);
             console.log("Position:", response.position);
+            console.log("Description:", response.description);
             document.getElementById("organization").value =
               response.organization || "";
             document.getElementById("position").value = response.position || "";
+            document.getElementById("description").value =
+              response.description || "";
           }
         }
       );
