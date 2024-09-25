@@ -15,15 +15,21 @@ def create_cover_letter():
     position = data.get("position")
     organization = data.get("organization")
     description = data.get("description")
-    print("This is running")
+    print(position, organization, description)
 
     try:
         document_name = f"{organization} {position} Cover Letter".replace("/", " or ")
 
         if not os.path.exists(f"cover_letters/{document_name}.pdf"):
             document = Document("template.docx")
+            print("Created document")
             output = generate_text(organization, position, description)
-            save_file(document=document, document_name=document_name, output=output)
+            if output:
+                print("Generated text")
+                save_file(document=document, document_name=document_name, output=output)
+                print("Saved file")
+            else:
+                return {"message": "An error occurred while generating the cover letter"}, 500
             return {"message": "Successfully created cover letter"}, 200
         return {"message": "Cover letter already exists"}, 200
     except Exception as e:

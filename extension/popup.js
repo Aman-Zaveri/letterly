@@ -24,8 +24,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Event listener for the Generate button
     document.getElementById("generate").addEventListener("click", function () {
-      document.getElementById("generate").disabled = true;
-
       const organization = document.getElementById("organization").value;
       const position = document.getElementById("position").value;
       const description = document.getElementById("description").value;
@@ -58,11 +56,9 @@ document.addEventListener("DOMContentLoaded", function () {
         .then((response) => response.json())
         .then((data) => {
           console.log("Success:", data);
-          document.getElementById("generate").disabled = false;
         })
         .catch((error) => {
           console.error("Error:", error);
-          document.getElementById("generate").disabled = false;
         });
     });
   });

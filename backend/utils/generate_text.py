@@ -6,33 +6,37 @@ import constants
 
 
 def generate_text(organization, job_title, description):
-    client = Client()
-    output = ""
+    try:
+        client = Client()
+        output = ""
 
-    while len(output.split()) > 400 or len(output.split()) < 100:
+        while len(output.split()) > 400 or len(output.split()) < 100:
 
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {
-                    "role": "user",
-                    "content": f"""{constants.PROMPT}
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": f"""{constants.PROMPT}
 
-The output should look like this:
-{constants.TEMPLATE}
+    The output should look like this:
+    {constants.TEMPLATE}
 
-{constants.RESUME}
+    {constants.RESUME}
 
-Job Information:
-Organization: {organization}
-Position: {job_title}
-Job Description: {description}""",
-                }
-            ],
-        )
+    Job Information:
+    Organization: {organization}
+    Position: {job_title}
+    Job Description: {description}""",
+                    }
+                ],
+            )
 
-        output = filter_text(response.choices[0].message.content)
+            output = filter_text(response.choices[0].message.content)
 
-    pyperclip.copy(output)
-    output = output.strip()
-    return output
+        pyperclip.copy(output)
+        output = output.strip()
+        return output
+    except Exception as e:
+        print(e)
+        return False
