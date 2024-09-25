@@ -77,6 +77,23 @@ function addPlusButton() {
       dropdownDiv.addEventListener("click", () => {
         const { organization, position, description } = extractJobDetails();
 
+        // Create the toast element
+        const toast = document.createElement("div");
+        toast.className = "toast"; // Use the class defined in CSS
+        toast.textContent = "Cover letter is being generated...";
+
+        // Append the toast to the body
+        document.body.appendChild(toast);
+
+        // Remove the toast after 3 seconds with animation
+        setTimeout(() => {
+          toast.classList.remove("bounceIn"); // Remove the entry animation
+          toast.classList.add("bounceOut"); // Add the exit animation
+          setTimeout(() => {
+            document.body.removeChild(toast); // Remove from DOM after animation
+          }, 500); // Match this time with the duration of bounceOut
+        }, 3000);
+
         fetch("http://localhost:5000/generate_cover_letter", {
           method: "POST",
           headers: {
@@ -91,6 +108,22 @@ function addPlusButton() {
           .then((response) => response.json())
           .then((data) => {
             console.log("Success:", data);
+            // Create the toast element for the API response
+            const apiToast = document.createElement("div");
+            apiToast.className = "toast"; // Use the class defined in CSS
+            apiToast.textContent = data.message || "Test";
+
+            // Append the toast to the body
+            document.body.appendChild(apiToast);
+
+            // Remove the toast after 3 seconds with animation
+            setTimeout(() => {
+              apiToast.classList.remove("bounceIn"); // Remove the entry animation
+              apiToast.classList.add("bounceOut"); // Add the exit animation
+              setTimeout(() => {
+              document.body.removeChild(apiToast); // Remove from DOM after animation
+              }, 500); // Match this time with the duration of bounceOut
+            }, 3000);
           })
           .catch((error) => {
             console.error("Error:", error);

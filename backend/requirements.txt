@@ -6,4 +6,3 @@ selenium
 pyperclip
 curl_cffi
 flask-cors
-logging
