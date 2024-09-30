@@ -8,10 +8,19 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://www.linkedin.com/*"],
+      "matches": ["<all_urls>"],
       "js": ["contentScript.js"],
-      "css": ["contentStyle.css"]
+      "css": ["contentStyle.css"],
+      "type": "module"
     }
   ],
-  "permissions": ["activeTab", "scripting", "webNavigation", "tabs"]
+  "permissions": ["activeTab", "scripting", "storage", "tabs"],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "https://cdn.jsdelivr.net/npm/lucide@0.446.0/dist/cjs/lucide.min.js"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }
