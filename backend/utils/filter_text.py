@@ -7,7 +7,7 @@ def filter_text(output: str) -> str:
 
     # Replace matched patterns with an empty string
     output = re.sub(pattern, "", output)
-    
+
     # Replace all \n with two newline characters
     # output = output.replace("\n", "\n\n")
 
@@ -27,5 +27,5 @@ def filter_text(output: str) -> str:
     # Extract the text between the start and end markers
     final_output = output[idx1 + len(start) + 1 : idx2]
 
-    print(f"Extracted text: {final_output}")
+    final_output = bytes(final_output, "utf-8").decode("unicode_escape")
     return final_output.strip()
