@@ -26,56 +26,93 @@ form {
 label {
   color: var(--light-blue);
   size: 12px;
-  font-weight: 600;
+  font-weight: 500;
+  margin-bottom: -15px;
+  margin-left: 10px;
+  background-color: #f9fafb;
+  z-index: 10;
+  padding: 0 8px;
+  width: fit-content;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
-input {
-  padding: 6px;
+textarea {
+  resize: none;
+}
+
+input,
+textarea {
+  padding: 12px 13px;
   border: 1px solid #d1d5db;
-  border-radius: 3px;
+  border-radius: 4px;
   outline: none;
   color: #64748b;
   background-color: transparent;
   font-size: small;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* More subtle shadow */
+  font-family: "Inter", sans-serif; /* Ensure consistent font-family */
+  font-weight: 300;
+  font-size: 12px;
 }
 
-input:hover {
-  border: 1px solid var(--hover-blue);
-  scale: 1.01;
-  transition: all 0.2s ease-in-out;
-}
-
-input:focus {
-  border: 1px solid var(--light-blue);
+.button-container {
+  width: 90%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 button {
-  padding: 5px;
-  border: 1px solid var(--light-blue);
-  border-radius: 3px;
-  background-color: var(--light-blue);
-  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 25px;
+  height: 25px;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
   cursor: pointer;
-  outline: none;
-  width: 100%;
-  font-weight: 600;
-  margin-top: 2px;
+  transition: all 0.2s ease-in-out;
+  color: #0c87e8;
+  align-self: flex-end; /* Move the button to the end of the parent div */
 }
 
 button:hover {
-  background-color: var(--hover-blue);
-  transition: all 0.1s ease-in-out;
+  background-color: #f0f0f0;
 }
 
-span {
-    color: red;
-    font-size: 12px;
-    font-weight: 600;
-    text-align: center;
+.spinner {
+  animation: rotate 2s linear infinite;
+}
+
+.spinner .path {
+  stroke: #0c87e8; /* Blue color for the spinner, change if needed */
+  stroke-linecap: round;
+  animation: dash 1.5s ease-in-out infinite;
+}
+
+@keyframes rotate {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes dash {
+  0% {
+    stroke-dasharray: 1, 150;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 90, 150;
+    stroke-dashoffset: -35;
+  }
+  100% {
+    stroke-dasharray: 90, 150;
+    stroke-dashoffset: -124;
+  }
 }

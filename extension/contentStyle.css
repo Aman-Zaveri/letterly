@@ -1,47 +1,167 @@
-.toast {
+#plus-button-linkedin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#plus-button-linkedin .plus-button-svg-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 24px;
+  height: 24px;
+}
+
+#plus-button-simplify {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 3px;
+}
+
+#plus-button-simplify button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px; /* w-4 */
+  height: 18px; /* h-4 */
+  outline: none; /* focus:outline-none */
+  color: #3f525b;
+  transition: color 150ms ease-in-out;
+}
+
+#plus-button-simplify button:hover {
+  color: #3ec0dd;
+}
+
+#plus-button-simplify .plus-button-svg-container {
+  width: 18px;
+  height: 18px;
+}
+
+/* Toast container styling */
+.toast-container {
   position: fixed;
-  top: 20px;
+  bottom: 20px;
   right: 20px;
-  background-color: #333;
+  z-index: 10000;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(100%);
+  transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+}
+
+/* Success and Error borders */
+.toast-success .toast {
+  border-left: 4px solid #007bff; /* Blue border for success */
+}
+
+.toast-error .toast {
+  border-left: 4px solid #dc3545; /* Red border for error */
+}
+
+/* When toast is visible (enter animation) */
+.toast-show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+  transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
+}
+
+/* Toast box styling with modern gradient */
+.toast {
+  background: linear-gradient(
+    135deg,
+    #1a1a1a,
+    #272727
+  ); /* Modern dark gradient */
   color: #fff;
   padding: 15px;
-  border-radius: 5px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  z-index: 10000;
-  animation: bounceIn 0.5s ease-in forwards,
-    bounceOut 0.5s ease-out 4.5s forwards;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-family: "Arial", sans-serif;
+  width: 400px;
+  border-left: 4px solid transparent; /* Default border */
+  backdrop-filter: blur(6px); /* Slight blur effect for a modern look */
 }
 
-@keyframes bounceIn {
-  0% {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  60% {
-    transform: translateX(-30px);
-    opacity: 1;
-  }
-  80% {
-    transform: translateX(10px);
-  }
+/* Toast header */
+.toast-header {
+  font-size: 18px; /* Increase font size for better clarity */
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #e0e0e0; /* Light gray for better contrast */
+}
+
+/* Position styling */
+.toast-position {
+  font-size: 16px;
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Company styling */
+.toast-company {
+  font-size: 14px;
+  font-weight: normal;
+  color: #b0b0b0; /* Softer color for the company name */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Toast body */
+.toast-body {
+  font-size: 14px;
+  color: #e0e0e0; /* Light gray to contrast with the dark background */
+}
+
+/* Loading spinner styles */
+.loading-spinner {
+  display: inline-block;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+#plus-button-simplify .spinner {
+  width: 18px;
+  height: 18px;
+}
+
+.spinner {
+  animation: rotate 2s linear infinite;
+}
+
+.spinner .path {
+  stroke: #007bff; /* Blue color for the spinner, change if needed */
+  stroke-linecap: round;
+  animation: dash 1.5s ease-in-out infinite;
+}
+
+@keyframes rotate {
   100% {
-    transform: translateX(0);
+    transform: rotate(360deg);
   }
 }
 
-@keyframes bounceOut {
+@keyframes dash {
   0% {
-    transform: translateX(0);
-    opacity: 1;
+    stroke-dasharray: 1, 150;
+    stroke-dashoffset: 0;
   }
-  20% {
-    transform: translateX(10px);
-  }
-  40% {
-    transform: translateX(-30px);
+  50% {
+    stroke-dasharray: 90, 150;
+    stroke-dashoffset: -35;
   }
   100% {
-    transform: translateX(100%);
-    opacity: 0;
+    stroke-dasharray: 90, 150;
+    stroke-dashoffset: -124;
   }
 }

@@ -9,7 +9,7 @@ def filter_text(output: str) -> str:
     output = re.sub(pattern, "", output)
     
     # Replace all \n with two newline characters
-    output = output.replace("\n", "\n\n")
+    # output = output.replace("\n", "\n\n")
 
     # Define start and end markers
     start = "Dear Hiring Manager,"
@@ -27,4 +27,5 @@ def filter_text(output: str) -> str:
     # Extract the text between the start and end markers
     final_output = output[idx1 + len(start) + 1 : idx2]
 
+    print(f"Extracted text: {final_output}")
     return final_output.strip()

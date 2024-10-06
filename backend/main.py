@@ -9,31 +9,34 @@ app = Flask(__name__)
 CORS(app)
 
 
-@app.route("/generate_cover_letter", methods=["POST"])
+@app.route("/generate", methods=["POST"])
 def create_cover_letter():
     data = request.json
     position = data.get("position")
-    organization = data.get("organization")
+    company = data.get("company")
     description = data.get("description")
-    print(position, organization, description)
 
     try:
-        document_name = f"{organization} {position} Cover Letter".replace("/", " or ")
+        document_name = f"{company} {position} Cover Letter".replace("/", " or ")
 
         if not os.path.exists(f"cover_letters/{document_name}.pdf"):
             document = Document("template.docx")
             print("Created document")
-            output = generate_text(organization, position, description)
+            output = generate_text(company, position, description)
             if output:
                 print("Generated text")
                 save_file(document=document, document_name=document_name, output=output)
                 print("Saved file")
             else:
-                return {"message": "An error occurred while generating the cover letter"}, 500
+                return {
+                    "error": "An error occurred while generating the cover letter"
+                }, 500
             return {"message": "Successfully created cover letter"}, 200
-        return {"message": "Cover letter already exists"}, 200
+        return {"error": "Cover letter already exists"}, 500
     except Exception as e:
-        return {"error": f"An error occurred while generating the cover letter: {e}"}, 500
+        return {
+            "error": f"An error occurred while generating the cover letter: {e}"
+        }, 500
     # return cover_letter
 
 
