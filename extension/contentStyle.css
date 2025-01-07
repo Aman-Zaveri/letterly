@@ -1,10 +1,10 @@
-#plus-button-linkedin {
+#linkedin-button {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-#plus-button-linkedin .plus-button-svg-container {
+#linkedin-button .svg-button-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -12,31 +12,32 @@
   height: 24px;
 }
 
-#plus-button-simplify {
+#simplify-button {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 3px;
 }
 
-#plus-button-simplify button {
-  display: inline-flex;
+#simplify-button {
+  display: flex;
   align-items: center;
   justify-content: center;
-  width: 18px; /* w-4 */
-  height: 18px; /* h-4 */
   outline: none; /* focus:outline-none */
   color: #3f525b;
   transition: color 150ms ease-in-out;
+  cursor: pointer;
 }
 
-#plus-button-simplify button:hover {
+#simplify-button .svg-button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 19px;
+  height: 19px;
+}
+
+#simplify-button button:hover {
   color: #3ec0dd;
-}
-
-#plus-button-simplify .plus-button-svg-container {
-  width: 18px;
-  height: 18px;
 }
 
 /* Toast container styling */
@@ -130,7 +131,7 @@
   vertical-align: middle;
 }
 
-#plus-button-simplify .spinner {
+#simplify-button .spinner {
   width: 18px;
   height: 18px;
 }
