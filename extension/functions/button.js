@@ -23,7 +23,11 @@ export function addButton(selectors, jobDetails) {
 
   const targetElement = document.querySelector(selectors.targetDiv);
   if (targetElement) {
-    targetElement.appendChild(buttonContainer);
+    if (selectors.buttonId === "simplify-button") {
+      targetElement.insertBefore(buttonContainer, targetElement.children[1]);
+    } else {
+      targetElement.insertBefore(buttonContainer, targetElement.firstChild);
+    }
   } else {
     console.error("Target element not found. Button not added.");
   }
@@ -40,13 +44,13 @@ function replaceWithSpinner(buttonId, buttonContainer) {
     button.style.display = "none"; // Hide the button
   }
 
-  let spinner = document.querySelector(".loading-spinner");
+  let spinner = document.querySelector(".spinner");
   if (!spinner) {
     spinner = document.createElement("div");
-    spinner.className = "loading-spinner";
+    spinner.className = "spinner";
     spinner.id = buttonId;
     spinner.innerHTML = `
-      <svg class="spinner" width="24px" height="24px" viewBox="0 0 50 50">
+      <svg viewBox="0 0 50 50">
         <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
       </svg>`;
     buttonContainer.appendChild(spinner); // Add spinner in place of the button
@@ -55,7 +59,7 @@ function replaceWithSpinner(buttonId, buttonContainer) {
 
 function restoreButton(buttonId) {
   const button = document.querySelector("#" + buttonId + " button");
-  const spinner = document.querySelector(".loading-spinner");
+  const spinner = document.querySelector("#" + buttonId + ".spinner");
 
   if (spinner) {
     spinner.remove(); // Remove spinner
@@ -95,7 +99,7 @@ function handleClick(buttonId, jobDetails) {
       showToast(jobDetails, data.message); // Display success toast
     })
     .catch((error) => {
-      showToast(jobDetails, error.message, true); // Display error toast with message
+      showToast(jobDetails, "Failed to connect to server", true); // Display error toast with message
     })
     .finally(() => {
       // Re-enable the button after the request is complete

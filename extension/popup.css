@@ -4,7 +4,15 @@
 }
 
 body {
-  background-color: #f9fafb;
+  background: linear-gradient(
+    135deg,
+    #1a1a1a,
+    #272727
+  ); /* Modern dark gradient */
+  color: #fff;
+  border-left: 4px solid #007bff; /* Blue border for success */
+  padding: 0px;
+  margin: 0px;
 }
 
 .container {
@@ -13,7 +21,7 @@ body {
   align-items: center;
   width: 200px;
   gap: 10px;
-  padding: 6px;
+  padding: 20px;
 }
 
 form {
@@ -24,14 +32,11 @@ form {
 }
 
 label {
-  color: var(--light-blue);
+  color: white;
   size: 12px;
-  font-weight: 500;
-  margin-bottom: -15px;
-  margin-left: 10px;
-  background-color: #f9fafb;
+  font-weight: 400;
+  background-color: transparent;
   z-index: 10;
-  padding: 0 8px;
   width: fit-content;
 }
 
@@ -51,7 +56,7 @@ textarea {
   border: 1px solid #d1d5db;
   border-radius: 4px;
   outline: none;
-  color: #64748b;
+  color: #d1d5db;
   background-color: transparent;
   font-size: small;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* More subtle shadow */
@@ -60,11 +65,21 @@ textarea {
   font-size: 12px;
 }
 
+textarea::-webkit-scrollbar {
+  display: none;
+}
+
+textarea {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+
 .button-container {
   width: 90%;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-top: 5px;
 }
 
 button {
@@ -78,12 +93,12 @@ button {
   border-radius: 50%;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
-  color: #0c87e8;
+  color: white;
   align-self: flex-end; /* Move the button to the end of the parent div */
 }
 
 button:hover {
-  background-color: #f0f0f0;
+  background-color: rgba(255, 255, 255, 0.3)
 }
 
 .spinner {

@@ -138,7 +138,11 @@ function addButton(selectors, jobDetails) {
   buttonContainer.appendChild(button);
   var targetElement = document.querySelector(selectors.targetDiv);
   if (targetElement) {
-    targetElement.appendChild(buttonContainer);
+    if (selectors.buttonId === "simplify-button") {
+      targetElement.insertBefore(buttonContainer, targetElement.children[1]);
+    } else {
+      targetElement.insertBefore(buttonContainer, targetElement.firstChild);
+    }
   } else {
     console.error("Target element not found. Button not added.");
   }
@@ -152,18 +156,18 @@ function replaceWithSpinner(buttonId, buttonContainer) {
   if (button) {
     button.style.display = "none"; // Hide the button
   }
-  var spinner = document.querySelector(".loading-spinner");
+  var spinner = document.querySelector(".spinner");
   if (!spinner) {
     spinner = document.createElement("div");
-    spinner.className = "loading-spinner";
+    spinner.className = "spinner";
     spinner.id = buttonId;
-    spinner.innerHTML = "\n      <svg class=\"spinner\" width=\"24px\" height=\"24px\" viewBox=\"0 0 50 50\">\n        <circle class=\"path\" cx=\"25\" cy=\"25\" r=\"20\" fill=\"none\" stroke-width=\"5\"></circle>\n      </svg>";
+    spinner.innerHTML = "\n      <svg viewBox=\"0 0 50 50\">\n        <circle class=\"path\" cx=\"25\" cy=\"25\" r=\"20\" fill=\"none\" stroke-width=\"5\"></circle>\n      </svg>";
     buttonContainer.appendChild(spinner); // Add spinner in place of the button
   }
 }
 function restoreButton(buttonId) {
   var button = document.querySelector("#" + buttonId + " button");
-  var spinner = document.querySelector(".loading-spinner");
+  var spinner = document.querySelector("#" + buttonId + ".spinner");
   if (spinner) {
     spinner.remove(); // Remove spinner
   }
@@ -198,7 +202,7 @@ function handleClick(buttonId, jobDetails) {
   }).then(function (data) {
     (0,_toast_js__WEBPACK_IMPORTED_MODULE_0__.showToast)(jobDetails, data.message); // Display success toast
   })["catch"](function (error) {
-    (0,_toast_js__WEBPACK_IMPORTED_MODULE_0__.showToast)(jobDetails, error.message, true); // Display error toast with message
+    (0,_toast_js__WEBPACK_IMPORTED_MODULE_0__.showToast)(jobDetails, "Failed to connect to server", true); // Display error toast with message
   })["finally"](function () {
     // Re-enable the button after the request is complete
     button.disabled = false;
