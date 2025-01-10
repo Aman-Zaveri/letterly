@@ -55,6 +55,22 @@ function extractJobInfo(selectors) {
     if (keywordMatchIndex !== -1) {
       description = description.slice(0, keywordMatchIndex).trim();
     }
+  } else if (currentURL.includes("waterlooworks.uwaterloo.ca/myAccount/co-op/full/jobs")) {
+    console.log("WaterlooWorks job info extraction");
+    var positionDashIndex = position.indexOf("-");
+    if (positionDashIndex !== -1) {
+      position = position.slice(positionDashIndex + 1).trim();
+      console.log("Position:", position);
+    }
+    var companyDashIndex = company.indexOf("-");
+    if (companyDashIndex !== -1) {
+      company = company.slice(0, companyDashIndex).trim();
+      console.log("Company:", company);
+    }
+    var elements = document.querySelectorAll(selectors.description);
+    description = Array.from(elements).map(function (element) {
+      return element.innerText;
+    });
   }
   if (position && company && description) {
     var jobInfo = {

@@ -3,7 +3,7 @@ export function extractJobInfo(selectors) {
   let position = document.querySelector(selectors.position)?.innerText;
   position = position?.replace(/\s*\(.*?\)\s*/g, "").trim();
 
-  const company = document.querySelector(selectors.company)?.innerText;
+  let company = document.querySelector(selectors.company)?.innerText;
   let description = document.querySelector(selectors.description)?.innerText;
 
   const currentURL = window.location.href;
@@ -12,6 +12,20 @@ export function extractJobInfo(selectors) {
     if (keywordMatchIndex !== -1) {
       description = description.slice(0, keywordMatchIndex).trim();
     }
+  } else if (currentURL.includes("waterlooworks.uwaterloo.ca/myAccount/co-op/full/jobs")) {
+    console.log("WaterlooWorks job info extraction");
+    const positionDashIndex = position.indexOf("-");
+    if (positionDashIndex !== -1) {
+      position = position.slice(positionDashIndex + 1).trim();
+      console.log("Position:", position);
+    }
+    const companyDashIndex = company.indexOf("-");
+    if (companyDashIndex !== -1) {
+      company = company.slice(0, companyDashIndex).trim();
+      console.log("Company:", company);
+    }
+    const elements = document.querySelectorAll(selectors.description);
+    description = Array.from(elements).map(element => element.innerText);
   }
 
   if (position && company && description) {

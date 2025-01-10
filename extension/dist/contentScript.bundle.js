@@ -26,14 +26,23 @@ function addButton(selectors, jobDetails) {
   var button = document.createElement("button");
   button.className = selectors.buttonClass;
   var svgContainer = document.createElement("div");
-  svgContainer.className = "svg-button-container";
-  svgContainer.innerHTML = "\n    <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-plus\"><path d=\"M5 12h14\"/><path d=\"M12 5v14\"/></svg>";
+  svgContainer.className = "svg-container";
+  if (selectors.buttonId === "waterloo-button") {
+    svgContainer.innerHTML = "+";
+  } else {
+    svgContainer.innerHTML = "\n      <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-plus\"><path d=\"M5 12h14\"/><path d=\"M12 5v14\"/></svg>";
+  }
   button.appendChild(svgContainer);
   buttonContainer.appendChild(button);
   var targetElement = document.querySelector(selectors.targetDiv);
   if (targetElement) {
     if (selectors.buttonId === "simplify-button") {
       targetElement.insertBefore(buttonContainer, targetElement.children[1]);
+    } else if (selectors.buttonId === "waterloo-button") {
+      targetElement.parentElement.style.display = "flex";
+      targetElement.parentElement.style.alignItems = "center";
+      targetElement.parentElement.style.gap = "15px";
+      targetElement.parentElement.appendChild(buttonContainer);
     } else {
       targetElement.insertBefore(buttonContainer, targetElement.firstChild);
     }
@@ -50,20 +59,36 @@ function replaceWithSpinner(buttonId, buttonContainer) {
   if (button) {
     button.style.display = "none"; // Hide the button
   }
-  var spinner = document.querySelector(".spinner");
-  if (!spinner) {
-    spinner = document.createElement("div");
-    spinner.className = "spinner";
-    spinner.id = buttonId;
-    spinner.innerHTML = "\n      <svg viewBox=\"0 0 50 50\">\n        <circle class=\"path\" cx=\"25\" cy=\"25\" r=\"20\" fill=\"none\" stroke-width=\"5\"></circle>\n      </svg>";
-    buttonContainer.appendChild(spinner); // Add spinner in place of the button
+  if (buttonId === "waterloo-button") {
+    var loading = document.querySelector(".simple-spinner");
+    if (!loading) {
+      loading = document.createElement("div");
+      loading.className = "simple-spinner";
+      loading.id = buttonId;
+      loading.style.width = "24px"; // Set fixed width
+      loading.style.height = "24px"; // Set fixed height
+      buttonContainer.appendChild(loading);
+    }
+  } else {
+    var _loading = document.querySelector(".spinner");
+    if (!_loading) {
+      _loading = document.createElement("div");
+      _loading.className = "spinner";
+      _loading.id = buttonId;
+      _loading.innerHTML = "\n        <svg viewBox=\"0 0 50 50\">\n          <circle class=\"path\" cx=\"25\" cy=\"25\" r=\"20\" fill=\"none\" stroke-width=\"5\"></circle>\n        </svg>";
+      buttonContainer.appendChild(_loading); // Add spinner in place of the button
+    }
   }
 }
 function restoreButton(buttonId) {
   var button = document.querySelector("#" + buttonId + " button");
-  var spinner = document.querySelector("#" + buttonId + ".spinner");
-  if (spinner) {
-    spinner.remove(); // Remove spinner
+  if (buttonId === "waterloo-button") {
+    var loading = document.querySelector(".simple-spinner");
+  } else {
+    var loading = document.querySelector("#" + buttonId + ".spinner");
+  }
+  if (loading) {
+    loading.remove(); // Remove loading animation
   }
   if (button) {
     button.style.display = "flex"; // Show the button again
@@ -96,7 +121,7 @@ function handleClick(buttonId, jobDetails) {
   }).then(function (data) {
     (0,_toast_js__WEBPACK_IMPORTED_MODULE_0__.showToast)(jobDetails, data.message); // Display success toast
   })["catch"](function (error) {
-    (0,_toast_js__WEBPACK_IMPORTED_MODULE_0__.showToast)(jobDetails, "Failed to connect to server", true); // Display error toast with message
+    (0,_toast_js__WEBPACK_IMPORTED_MODULE_0__.showToast)(jobDetails, error.message, true); // Display error toast with message
   })["finally"](function () {
     // Re-enable the button after the request is complete
     button.disabled = false;
@@ -130,6 +155,22 @@ function extractJobInfo(selectors) {
     if (keywordMatchIndex !== -1) {
       description = description.slice(0, keywordMatchIndex).trim();
     }
+  } else if (currentURL.includes("waterlooworks.uwaterloo.ca/myAccount/co-op/full/jobs")) {
+    console.log("WaterlooWorks job info extraction");
+    var positionDashIndex = position.indexOf("-");
+    if (positionDashIndex !== -1) {
+      position = position.slice(positionDashIndex + 1).trim();
+      console.log("Position:", position);
+    }
+    var companyDashIndex = company.indexOf("-");
+    if (companyDashIndex !== -1) {
+      company = company.slice(0, companyDashIndex).trim();
+      console.log("Company:", company);
+    }
+    var elements = document.querySelectorAll(selectors.description);
+    description = Array.from(elements).map(function (element) {
+      return element.innerText;
+    });
   }
   if (position && company && description) {
     var jobInfo = {
@@ -200,7 +241,6 @@ var websiteSelectors = {
       company: ".job-details-jobs-unified-top-card__company-name",
       description: "#job-details > div"
     },
-    jobContainer: "details-card-128b4cc8-9ceb-424f-b58b-6e8ba8dea3b5",
     targetDiv: "div.job-details-jobs-unified-top-card__top-buttons",
     buttonId: "linkedin-button",
     buttonClass: "social-share__dropdown-trigger artdeco-button artdeco-button--3 artdeco-button--tertiary artdeco-button--circle artdeco-button--muted artdeco-dropdown__trigger artdeco-dropdown__trigger--placement-bottom ember-view",
@@ -213,9 +253,20 @@ var websiteSelectors = {
       company: "p.text-left.text-lg.font-bold.text-secondary-400",
       description: "div.mt-4:nth-of-type(2)"
     },
-    jobContainer: "div.flex.flex-col.gap-8.lg\\:flex-row",
     targetDiv: "div.mt-2.flex.justify-end.gap-x-4.text-sm.text-gray-500",
     buttonId: "simplify-button",
+    buttonClass: "",
+    buttonContainerClass: ""
+  },
+  waterlooWorks: {
+    urlPattern: "waterlooworks.uwaterloo.ca/myAccount/co-op/full/jobs",
+    information: {
+      position: ".dashboard-header__profile-information h1",
+      company: ".dashboard-header__profile-information h2",
+      description: ".np-view-question--31, .np-view-question--32, .np-view-question--33"
+    },
+    targetDiv: ".clickGuard.applyButton",
+    buttonId: "waterloo-button",
     buttonClass: "",
     buttonContainerClass: ""
   },
@@ -226,7 +277,6 @@ var websiteSelectors = {
       company: ".jobsearch-InlineCompanyRating",
       description: ".jobsearch-JobMetadataHeader-item"
     },
-    jobContainer: "details-card-128b4cc8-9ceb-424f-b58b-6e8ba8dea3b5",
     targetDiv: ".jobsearch-JobInfoHeader",
     buttonId: "indeed-button",
     buttonClass: "plus-button-indeed",

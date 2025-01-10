@@ -132,14 +132,23 @@ function addButton(selectors, jobDetails) {
   var button = document.createElement("button");
   button.className = selectors.buttonClass;
   var svgContainer = document.createElement("div");
-  svgContainer.className = "svg-button-container";
-  svgContainer.innerHTML = "\n    <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-plus\"><path d=\"M5 12h14\"/><path d=\"M12 5v14\"/></svg>";
+  svgContainer.className = "svg-container";
+  if (selectors.buttonId === "waterloo-button") {
+    svgContainer.innerHTML = "+";
+  } else {
+    svgContainer.innerHTML = "\n      <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-plus\"><path d=\"M5 12h14\"/><path d=\"M12 5v14\"/></svg>";
+  }
   button.appendChild(svgContainer);
   buttonContainer.appendChild(button);
   var targetElement = document.querySelector(selectors.targetDiv);
   if (targetElement) {
     if (selectors.buttonId === "simplify-button") {
       targetElement.insertBefore(buttonContainer, targetElement.children[1]);
+    } else if (selectors.buttonId === "waterloo-button") {
+      targetElement.parentElement.style.display = "flex";
+      targetElement.parentElement.style.alignItems = "center";
+      targetElement.parentElement.style.gap = "15px";
+      targetElement.parentElement.appendChild(buttonContainer);
     } else {
       targetElement.insertBefore(buttonContainer, targetElement.firstChild);
     }
@@ -156,20 +165,36 @@ function replaceWithSpinner(buttonId, buttonContainer) {
   if (button) {
     button.style.display = "none"; // Hide the button
   }
-  var spinner = document.querySelector(".spinner");
-  if (!spinner) {
-    spinner = document.createElement("div");
-    spinner.className = "spinner";
-    spinner.id = buttonId;
-    spinner.innerHTML = "\n      <svg viewBox=\"0 0 50 50\">\n        <circle class=\"path\" cx=\"25\" cy=\"25\" r=\"20\" fill=\"none\" stroke-width=\"5\"></circle>\n      </svg>";
-    buttonContainer.appendChild(spinner); // Add spinner in place of the button
+  if (buttonId === "waterloo-button") {
+    var loading = document.querySelector(".simple-spinner");
+    if (!loading) {
+      loading = document.createElement("div");
+      loading.className = "simple-spinner";
+      loading.id = buttonId;
+      loading.style.width = "24px"; // Set fixed width
+      loading.style.height = "24px"; // Set fixed height
+      buttonContainer.appendChild(loading);
+    }
+  } else {
+    var _loading = document.querySelector(".spinner");
+    if (!_loading) {
+      _loading = document.createElement("div");
+      _loading.className = "spinner";
+      _loading.id = buttonId;
+      _loading.innerHTML = "\n        <svg viewBox=\"0 0 50 50\">\n          <circle class=\"path\" cx=\"25\" cy=\"25\" r=\"20\" fill=\"none\" stroke-width=\"5\"></circle>\n        </svg>";
+      buttonContainer.appendChild(_loading); // Add spinner in place of the button
+    }
   }
 }
 function restoreButton(buttonId) {
   var button = document.querySelector("#" + buttonId + " button");
-  var spinner = document.querySelector("#" + buttonId + ".spinner");
-  if (spinner) {
-    spinner.remove(); // Remove spinner
+  if (buttonId === "waterloo-button") {
+    var loading = document.querySelector(".simple-spinner");
+  } else {
+    var loading = document.querySelector("#" + buttonId + ".spinner");
+  }
+  if (loading) {
+    loading.remove(); // Remove loading animation
   }
   if (button) {
     button.style.display = "flex"; // Show the button again
@@ -202,7 +227,7 @@ function handleClick(buttonId, jobDetails) {
   }).then(function (data) {
     (0,_toast_js__WEBPACK_IMPORTED_MODULE_0__.showToast)(jobDetails, data.message); // Display success toast
   })["catch"](function (error) {
-    (0,_toast_js__WEBPACK_IMPORTED_MODULE_0__.showToast)(jobDetails, "Failed to connect to server", true); // Display error toast with message
+    (0,_toast_js__WEBPACK_IMPORTED_MODULE_0__.showToast)(jobDetails, error.message, true); // Display error toast with message
   })["finally"](function () {
     // Re-enable the button after the request is complete
     button.disabled = false;
