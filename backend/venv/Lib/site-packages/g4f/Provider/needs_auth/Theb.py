@@ -5,7 +5,6 @@ import time
 from ...typing import CreateResult, Messages
 from ..base_provider import AbstractProvider
 from ..helper import format_prompt
-from ...webdriver import WebDriver, WebDriverSession, element_send_text
 
 models = {
     "theb-ai": "TheB.AI",
@@ -34,10 +33,10 @@ models = {
 class Theb(AbstractProvider):
     label = "TheB.AI"
     url = "https://beta.theb.ai"
-    working = True
-    supports_gpt_35_turbo = True
-    supports_gpt_4 = True
+    working = False
     supports_stream = True
+    
+    models = models.keys()
 
     @classmethod
     def create_completion(

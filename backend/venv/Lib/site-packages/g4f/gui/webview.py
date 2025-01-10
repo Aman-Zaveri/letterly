@@ -10,7 +10,6 @@ except ImportError:
     has_platformdirs = False
 
 from g4f.gui.gui_parser import gui_parser
-from g4f.gui.server.js_api import JsApi
 import g4f.version
 import g4f.debug
 
@@ -31,7 +30,6 @@ def run_webview(
         f"g4f - {g4f.version.utils.current_version}",
         os.path.join(dirname, "client/index.html"),
         text_select=True,
-        js_api=JsApi(),
     )
     if has_platformdirs and storage_path is None:
         storage_path = user_config_dir("g4f-webview")
@@ -40,8 +38,7 @@ def run_webview(
         storage_path=storage_path,
         debug=debug,
         http_port=http_port,
-        ssl=ssl,
-        gui=gui
+        ssl=ssl
     )
 
 if __name__ == "__main__":
@@ -49,4 +46,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.debug:
         g4f.debug.logging = True
-    run_webview(args.debug, args.port)
+    run_webview(args.debug, args.port, not args.debug)

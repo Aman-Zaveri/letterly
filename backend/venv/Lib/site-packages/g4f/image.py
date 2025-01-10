@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+import os
 import re
-from io import BytesIO
+import io
+import time
+import uuid
 import base64
-from .typing import ImageType, Union, Image
-
+import asyncio
+from io import BytesIO
+from pathlib import Path
+from aiohttp import ClientSession, ClientError
 try:
     from PIL.Image import open as open_image, new as new_image
     from PIL.Image import FLIP_LEFT_RIGHT, ROTATE_180, ROTATE_270, ROTATE_90
@@ -12,7 +17,11 @@ try:
 except ImportError:
     has_requirements = False
 
+from .typing import ImageType, Union, Image, Optional, Cookies
 from .errors import MissingRequirementsError
+from .providers.response import ImageResponse, ImagePreview
+from .requests.aiohttp import get_connector
+from . import debug
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'}
 
@@ -22,6 +31,9 @@ EXTENSIONS_MAP: dict[str, str] = {
     "image/gif": "gif",
     "image/webp": "webp",
 }
+
+# Define the directory for generated images
+images_dir = "./generated_images"
 
 def to_image(image: ImageType, is_svg: bool = False) -> Image:
     """
@@ -36,7 +48,7 @@ def to_image(image: ImageType, is_svg: bool = False) -> Image:
     if not has_requirements:
         raise MissingRequirementsError('Install "pillow" package for images')
 
-    if isinstance(image, str):
+    if isinstance(image, str) and image.startswith("data:"):
         is_data_uri_an_image(image)
         image = extract_data_uri(image)
 
@@ -128,7 +140,7 @@ def extract_data_uri(data_uri: str) -> bytes:
     Returns:
         bytes: The extracted binary data.
     """
-    data = data_uri.split(",")[1]
+    data = data_uri.split(",")[-1]
     data = base64.b64decode(data)
     return data
 
@@ -184,46 +196,6 @@ def process_image(image: Image, new_width: int, new_height: int) -> Image:
         image = image.convert("RGB")
     return image
 
-def to_base64_jpg(image: Image, compression_rate: float) -> str:
-    """
-    Converts the given image to a base64-encoded string.
-
-    Args:
-        image (Image.Image): The image to convert.
-        compression_rate (float): The compression rate (0.0 to 1.0).
-
-    Returns:
-        str: The base64-encoded image.
-    """
-    output_buffer = BytesIO()
-    image.save(output_buffer, format="JPEG", quality=int(compression_rate * 100))
-    return base64.b64encode(output_buffer.getvalue()).decode()
-
-def format_images_markdown(images: Union[str, list], alt: str, preview: Union[str, list] = None) -> str:
-    """
-    Formats the given images as a markdown string.
-
-    Args:
-        images: The images to format.
-        alt (str): The alt for the images.
-        preview (str, optional): The preview URL format. Defaults to "{image}?w=200&h=200".
-
-    Returns:
-        str: The formatted markdown string.
-    """
-    if isinstance(images, str):
-        result = f"[![{alt}]({preview.replace('{image}', images) if preview else images})]({images})"
-    else:
-        if not isinstance(preview, list):
-            preview = [preview.replace('{image}', image) if preview else image for image in images]
-        result = "\n".join(
-            f"[![#{idx+1} {alt}]({preview[idx]})]({image})"
-            #f'[<img src="{preview[idx]}" width="200" alt="#{idx+1} {alt}">]({image})'
-            for idx, image in enumerate(images)
-        )
-    start_flag = "<!-- generated images start -->\n"
-    end_flag = "<!-- generated images end -->\n"
-    return f"\n{start_flag}{result}\n{end_flag}\n"
 
 def to_bytes(image: ImageType) -> bytes:
     """
@@ -237,7 +209,7 @@ def to_bytes(image: ImageType) -> bytes:
     """
     if isinstance(image, bytes):
         return image
-    elif isinstance(image, str):
+    elif isinstance(image, str) and image.startswith("data:"):
         is_data_uri_an_image(image)
         return extract_data_uri(image)
     elif isinstance(image, Image):
@@ -245,7 +217,15 @@ def to_bytes(image: ImageType) -> bytes:
         image.save(bytes_io, image.format)
         image.seek(0)
         return bytes_io.getvalue()
+    elif isinstance(image, (str, os.PathLike)):
+        return Path(image).read_bytes()
+    elif isinstance(image, Path):
+        return image.read_bytes()
     else:
+        try:
+            image.seek(0)
+        except (AttributeError, io.UnsupportedOperation):
+            pass
         return image.read()
 
 def to_data_uri(image: ImageType) -> str:
@@ -255,32 +235,43 @@ def to_data_uri(image: ImageType) -> str:
         return f"data:{is_accepted_format(data)};base64,{data_base64}"
     return image
 
-class ImageResponse:
-    def __init__(
-        self,
-        images: Union[str, list],
-        alt: str,
-        options: dict = {}
-    ):
-        self.images = images
-        self.alt = alt
-        self.options = options
+# Function to ensure the images directory exists
+def ensure_images_dir():
+    os.makedirs(images_dir, exist_ok=True)
 
-    def __str__(self) -> str:
-        return format_images_markdown(self.images, self.alt, self.get("preview"))
+async def copy_images(
+    images: list[str],
+    cookies: Optional[Cookies] = None,
+    proxy: Optional[str] = None
+) -> list[str]:
+    ensure_images_dir()
+    async with ClientSession(
+        connector=get_connector(proxy=proxy),
+        cookies=cookies
+    ) as session:
+        async def copy_image(image: str) -> str:
+            target = os.path.join(images_dir, f"{int(time.time())}_{str(uuid.uuid4())}")
+            if image.startswith("data:"):
+                with open(target, "wb") as f:
+                    f.write(extract_data_uri(image))
+            else:
+                try:
+                    async with session.get(image) as response:
+                        response.raise_for_status()
+                        with open(target, "wb") as f:
+                            async for chunk in response.content.iter_chunked(4096):
+                                f.write(chunk)
+                except ClientError as e:
+                    debug.log(f"copy_images failed: {e.__class__.__name__}: {e}")
+                    return image
+            with open(target, "rb") as f:
+                extension = is_accepted_format(f.read(12)).split("/")[-1]
+                extension = "jpg" if extension == "jpeg" else extension
+            new_target = f"{target}.{extension}"
+            os.rename(target, new_target)
+            return f"/images/{os.path.basename(new_target)}"
 
-    def get(self, key: str):
-        return self.options.get(key)
-
-    def get_list(self) -> list[str]:
-        return [self.images] if isinstance(self.images, str) else self.images
-
-class ImagePreview(ImageResponse):
-    def __str__(self):
-        return ""
-
-    def to_string(self):
-        return super().__str__()
+        return await asyncio.gather(*[copy_image(image) for image in images])
 
 class ImageDataResponse():
     def __init__(
